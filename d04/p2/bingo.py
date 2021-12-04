@@ -69,10 +69,9 @@ boards = []
 while len(lines) >= 5:
     b = Board(lines[:5])
     boards.append(b)
-    print(b.board)
     lines = lines[6:]
 
-def play():
+def play(boards):
     for num in draw:
         for b in boards:
             b.mark(num)
@@ -80,6 +79,8 @@ def play():
             if b.win():
                 score = b.score()
                 print(num, score, num*score)
-                return
+                return b
 
-play()
+while len(boards) > 0:
+    b = play(boards)
+    boards.remove(b)
