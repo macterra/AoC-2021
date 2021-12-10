@@ -110,10 +110,7 @@ def noDoubles(path, name):
     if name == 'start' or name == 'end':
         return False
 
-    small = []
-    for n in path:
-        if n[0].islower():
-            small.append(n)
+    small = [n for n in path if n[0].islower()]
             
     #print('noDoubles', set(small), small, len(set(small)), len(small), len(set(small)) == len(small))
     return len(set(small)) == len(small)
