@@ -25,7 +25,7 @@ input = open('data', 'r').read()
 def hex2bin(hex):
     bin = []
     for c in hex:
-        bin.extend([x for x in f'{int(c,16):0>4b}'])
+        bin.extend([f'{int(c,16):0>4b}'])
     return "".join(bin)
 
 class Packet:
@@ -91,24 +91,24 @@ class Packet:
 
     def readPacketsLen(self):
         length = self.read(15)
-        print(f"readPacketsLen {length}")
+        #print(f"readPacketsLen {length}")
         bits = self.bits[:length]
         self.bits = self.bits[length:]
         self.subs = []
         while len(bits):
             sub = Packet(bits)
-            print(f"sub {sub}")
+            #print(f"sub {sub}")
             bits = sub.bits
             self.versum += sub.versum
             self.subs.append(sub)
         
     def readPacketsNum(self):
         num = self.read(11)
-        print(f"readPacketsNum {num}")
+        #print(f"readPacketsNum {num}")
         self.subs = []
         for i in range(num):
             sub = Packet(self.bits)
-            print(f"sub {sub}")
+            #print(f"sub {sub}")
             self.bits = sub.bits
             self.versum += sub.versum
             self.subs.append(sub)
