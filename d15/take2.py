@@ -17,7 +17,14 @@ input = """1163751742
 1293138521
 2311944581"""
 
-input = open('data', 'r').read()
+input = """
+18888
+18111
+18181
+18181
+11181"""
+
+#input = open('data', 'r').read()
 
 def makeGrid(input):
     grid = []
@@ -42,6 +49,7 @@ def makeGraph(grid):
             n1 = i*w + j
             n2 = i*w + j - 1
             graph[n1, n2] = grid[i][j]
+            #graph[n2, n1] = grid[i][j]
 
     for j in range(w):
         for i in range(1, h):
@@ -49,40 +57,39 @@ def makeGraph(grid):
             n1 = (i-1)*w + j
             n2 = i*w + j
             graph[n1, n2] = grid[i][j]
+            #graph[n2, n1] = grid[i][j]
 
     return csr_matrix(graph)
+
+def printPath(predecessors):
+    print(predecessors)
+    n = predecessors[-1]
+    path = []
+    ht = len(grid)
+    width = len(grid[0])
+    while n >= 0:
+        i = n%width
+        j = n//width
+        c = (j, i)
+        path.append(c)
+        #print(n, c)
+        n = predecessors[n]
+    path.reverse()
+    path.append((ht-1,width-1)) 
+    print(path)
+    print(len(path))  
+
+    risk = 0
+    for i, j in path[1:]:
+        risk += grid[i][j]
+        print((i, j), grid[i][j], risk)
 
 grid = makeGrid(input)
 print(grid)
 graph = makeGraph(grid)
 print(graph)
 
-dist_matrix, predecessors = shortest_path(csgraph=graph, method='BF', directed=False, indices=0, return_predecessors=True)
+dist_matrix, predecessors = shortest_path(csgraph=graph, directed=False, indices=0, return_predecessors=True)
 
 print(dist_matrix)
-print(predecessors)
-
-print(dist_matrix[-1])
-
-n = predecessors[-1]
-path = []
-ht = len(grid)
-width = len(grid[0])
-while n >= 0:
-    i = n%width
-    j = n//width
-    c = (j, i)
-    path.append(c)
-    #print(n, c)
-    n = predecessors[n]
-path.reverse()
-path.append((ht-1,width-1)) 
-print(path)
-print(len(path))  
-
-risk = 0
-for i, j in path[1:]:
-    risk += grid[i][j]
-    print((i, j), grid[i][j], risk)
-
-print(dist_matrix[-1])
+printPath(predecessors)
