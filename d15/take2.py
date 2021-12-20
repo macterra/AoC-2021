@@ -2,11 +2,11 @@ import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import shortest_path
 
-input = """392
+input1 = """392
 721
 413"""
 
-input = """1163751742
+input2 = """1163751742
 1381373672
 2136511328
 3694931569
@@ -17,8 +17,7 @@ input = """1163751742
 1293138521
 2311944581"""
 
-input = """
-18888
+input3 = """18888
 18111
 18181
 18181
@@ -84,7 +83,7 @@ def printPath(predecessors):
         risk += grid[i][j]
         print((i, j), grid[i][j], risk)
 
-grid = makeGrid(input)
+grid = makeGrid(input2)
 print(grid)
 graph = makeGraph(grid)
 print(graph)
