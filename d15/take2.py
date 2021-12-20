@@ -83,7 +83,7 @@ def printPath(predecessors):
         risk += grid[i][j]
         print((i, j), grid[i][j], risk)
 
-grid = makeGrid(input2)
+grid = makeGrid(input3)
 print(grid)
 graph = makeGraph(grid)
 print(graph)

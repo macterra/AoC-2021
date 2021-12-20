@@ -11,6 +11,12 @@ input = """1163751742
 1293138521
 2311944581"""
 
+input3 = """18888
+18111
+18181
+18181
+11181"""
+
 class ShortPath(astar.AStar):
     def __init__(self, input):
         print(input)
@@ -52,6 +58,13 @@ class ShortPath(astar.AStar):
         return self.grid[y][x]
 
     def heuristic_cost_estimate(self, current, goal):
+        x1, y1 = self.node2coord(current) 
+        x2, y2 = self.node2coord(goal)
+        dx = x1-x2
+        dy = y1-y2
+        return dx*dx + dy*dy
+
+    def heuristic_cost_estimate2(self, current, goal):
         x, y = self.node2coord(current) 
         x2, y2 = self.node2coord(goal)
         cost = 0
@@ -89,7 +102,7 @@ class ShortPath(astar.AStar):
         self.cost = cost
         return path
 
-sp = ShortPath(input)
+sp = ShortPath(input3)
 near = sp.neighbors(16)
 print(near)
 print(sp.distance_between(26, 16))
