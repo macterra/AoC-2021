@@ -14,61 +14,41 @@ input = """[[[[[9,8],1],2],3],4]
 [[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]
 [[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]"""
 
-#input = "[[[[[9,8],1],2],3],4]"
-#input = "[7,[6,[5,[4,[3,2]]]]]"
-input = "[[6,[5,[4,[3,2]]]],1]"
-#input = "[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]"
+class Item:
+    def __init__(self, val, dep):
+        self.val = val
+        self.dep = dep
+    
+    def __repr__(self):
+        return f"<{self.val} {self.dep}>"
 
-def explode2(lt, rt, depth):
-    print(f"explode d={depth} lt={lt} rt={rt}")
-
-    if isinstance(lt, list):
-        a, b = lt
-
-        if depth > 2:
-            if isinstance(a, list):
-                c, d = a
-                return [[0, d+b], rt]
-            if isinstance(b, list):
-                c, d = b
-                return [[a+c, 0], rt]
-
-        return [explode(a, b, depth+1), rt]
-    elif isinstance(rt, list):
-        a, b = rt
-
-        if depth > 2:
-            if isinstance(a, list):
-                c, d = a
-                return [lt, [0, d+b]]
-            if isinstance(b, list):
-                c, d = b
-                return [lt, [a+c, 0]]
-
-        return [lt, explode(a, b, depth+1)]
+def flatten(num, dep, flat):
+    if isinstance(num, int):
+        flat.append(Item(num, dep))
     else:
-        return explode(lt, rt, depth+1)
+        for i in num:
+            flatten(i, dep+1, flat)
+    return flat
 
-def explode(left, right, depth):
-    print(f"explode d={depth} lt={left} rt={right}")
-
-    if isinstance(left, list):
-        return explode(left[0], left[1], depth+1)
-
-    if isinstance(right, list):
-        return explode(right[0], right[1], depth+1)
-
-    return [left, right], depth > 4
-
-def reduce(num):
-    a, b = num
-    return explode(a, b, 1)
+def explode(num):
+    count = len(num)
+    for i in range(count):
+        if num[i].dep > 4:
+            if i > 0:
+                num[i-1].val += num[i].val
+            if i < count-2:
+                num[i+2].val += num[i+1].val
+            num.insert(i, Item(0,num[i].dep-1))
+            del num[i+1:i+3]
+            return True
+    return False
 
 lines = input.split('\n')
 for line in lines:
     x = json.loads(line)
-    f = reduce(x)
+    f = flatten(x, 0, [])
     print(x)
     print(f)
+    ex = explode(f)
+    print(ex, f)
     print()
-
