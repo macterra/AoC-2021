@@ -23,7 +23,7 @@ input3 = """18888
 18181
 11181"""
 
-#input = open('data', 'r').read()
+input4 = open('data', 'r').read()
 
 def makeGrid(input):
     grid = []
@@ -48,7 +48,6 @@ def makeGraph(grid):
             n1 = i*w + j
             n2 = i*w + j - 1
             graph[n1, n2] = grid[i][j]
-            #graph[n2, n1] = grid[i][j]
 
     for j in range(w):
         for i in range(1, h):
@@ -56,7 +55,6 @@ def makeGraph(grid):
             n1 = (i-1)*w + j
             n2 = i*w + j
             graph[n1, n2] = grid[i][j]
-            #graph[n2, n1] = grid[i][j]
 
     return csr_matrix(graph)
 
@@ -83,12 +81,17 @@ def printPath(predecessors):
         risk += grid[i][j]
         print((i, j), grid[i][j], risk)
 
-grid = makeGrid(input3)
-print(grid)
+grid = makeGrid(input4)
+print(grid, len(grid))
 graph = makeGraph(grid)
-print(graph)
+print(graph, graph.shape[0])
 
 dist_matrix, predecessors = shortest_path(csgraph=graph, directed=False, indices=0, return_predecessors=True)
 
 print(dist_matrix)
 printPath(predecessors)
+
+# for i in range(len(predecessors)):
+#     print(i, predecessors[i])
+
+print(dist_matrix[-1])
