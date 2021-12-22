@@ -157,13 +157,6 @@ def makeProc(input):
             print(f"failed to parse {line}")
     return cuboids
 
-cuboids = makeProc(input)
-for i in range(len(cuboids)):
-    for j in range(i+1, len(cuboids)):
-        c1 = cuboids[i]
-        c2 = cuboids[j]
-        print(i, j, c1.intersects(c2), c2.intersects(c1), c1.contains(c2), c2.contains(c1),c1, c2)
-
 def addCuboid(space, cuboid):    
     next = []
     for c in space:
@@ -181,17 +174,12 @@ def addCuboid(space, cuboid):
 
     return next
 
-def test():
-    c1 = Cuboid(True, (-100, 100, -10, 10, -10, 10))
-    c2 = Cuboid(False, (-10, 10, -100, 100, -100, 100))
-
-    print(c1.intersection(c2))
-    print(c2.intersection(c1))
+cuboids = makeProc(input)
 
 space = []
 for c in cuboids:
     space = addCuboid(space, c)
-    print(space)
+    #print(space)
 
 total = 0
 for c in space:
