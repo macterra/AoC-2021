@@ -171,6 +171,9 @@ class Scanner:
             #print('beacon', i, x, y, z)
             beacons.append([int(x), int(y), int(z)])
         self.beacons = beacons
+        self.generateVariants()
+
+    def generateVariants(self):
         variants = []
         for beacon in self.beacons:
             variants.append(list(rotations(beacon)))
@@ -208,7 +211,17 @@ class Scanner:
                 self.lock = var
                 return mine
         return {}
+
+    def merge(self, cloud):
+        scanner = Scanner()
+        scanner.n = self.n
+        cloud = cloud.union(self.cloud(0))
+        scanner.beacons = list(cloud)
+        scanner.generateVariants()
+        return scanner
  
+#input = open('data', 'r').read()
+
 blocks = input.split('\n\n')
 #print(blocks)
 scanners = []
@@ -216,19 +229,25 @@ for block in blocks:
     scanner = Scanner()
     scanner.read(block)
     scanners.append(scanner)
-#print(scanners)
+print(scanners)
 
-# cloud = scanners[0].cloud(0)
-# for scanner in scanners[1:]:
-#     match = scanner.bestMatch(cloud)
-#     cloud = cloud.union(match)
-# print(len(cloud))
+def search(scanners):
+    count = len(scanners)
+    for i in range(count):
+        for j in range(i+1, count):
+            print(i,j)
+            s1 = scanners[i]
+            s2 = scanners[j]
+            match = s1.bestMatch(s2.cloud(0))
+            if match:
+                s3 = s2.merge(match)
+                scanners.remove(s1)
+                scanners.remove(s2)
+                scanners.append(s3)
+                return scanners
 
-#match = scanners[1].bestMatch(scanners[0].cloud(0))
+while len(scanners) > 1:
+    scanners = search(scanners)
 
-count = len(scanners)
-for i in range(count):
-    for j in range(i+1, count):
-        print(i,j)
-        match = scanners[i].bestMatch(scanners[j].cloud(0))
-
+beacons = scanners[0].beacons
+print(len(beacons))        
