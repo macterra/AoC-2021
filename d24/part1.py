@@ -188,6 +188,12 @@ def crossover(a, b):
     #print(f"crossover {a} x {b} at {x} = {c} {len(c)}")
     return c
 
+def fitness(k, z):
+    if z > 0:
+        return 1/(1+z)
+    else:
+        return int(k)/1e13
+
 def genetic(alu, pop):
     z = {}
     for i in pop:
@@ -200,24 +206,17 @@ def genetic(alu, pop):
             if z[k] == 0:
                 print(f"valid! {k}")
     print(f"min z = {minz}")
-    # fit = {}
-    # for k in z:
-        # if z[k] == 0:
-        #     fit[k] = int(k)/1e14
-        # else:
-        #     fit[k] = 1/(1+z[k])
-        #fit[k] = 1/(1+z[k])
-    fit = {i[0]:1/(1+i[1]) for i in z.items()}
+    fit = {k:fitness(k,v) for k, v in z.items()}
     total = sum(fit.values())
     #print(fit, total)
-    fit = {i[0]:i[1]/total for i in fit.items()}
+    fit = {k: v/total for k, v in fit.items()}
     print(fit)
     pool = sorted(fit.items(), key=lambda item: item[1])
-    # for i in pool:
-    #     print(i)
     sz = len(pop)
-    next = []
-    for i in range(sz):
+    best = pool[-1][0]
+    print(f"best = {best}")
+    next = [ best ]
+    for i in range(sz-1):
         a = pickRandom(pool)
         b = pickRandom(pool)
         c = crossover(a, b)
