@@ -192,8 +192,7 @@ def fitness(k, z):
     if z > 0:
         return 1/(1+z)
     else:
-        x = int(k)/1e13
-        return x
+        return 1e14/int(k)
 
 def genetic(alu, pop):
     z = {}
