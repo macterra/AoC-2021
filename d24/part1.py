@@ -17,26 +17,32 @@ class ALU:
         for line in lines:
             prog.append(line.split(' '))
         self.prog = prog
+        self._reset()
+
+    def _reset(self):
         self.w = 0
         self.x = 0
         self.y = 0
         self.z = 0
+        self.valid = False
 
     def __repr__(self):
-        return f"w={self.w} x={self.x} y={self.y} z={self.z}"
+        return f"w={self.w} x={self.x} y={self.y} z={self.z} valid={self.valid}"
 
     def run(self, input):
+        self._reset()
         self.input = [x for x in str(input)]
 
         for p in self.prog:
             self.execute(p)
-            print(self)
-        return self.z == 0  
+            #print(self)
+        self.valid = self.z == 0
+        return self.valid
 
     def execute(self, p):
         op = p[0]
         reg = p[1]
-        print(f"exec {op} on {reg}")
+        #print(f"exec {op} on {reg}")
 
         if op == 'inp':
             self._inp(reg)
@@ -70,8 +76,8 @@ class ALU:
 
     def _inp(self, reg):
         v = int(self.input.pop(0))
-        print(f"inp {v} into {reg}")
-        print(self.input)
+        #print(f"inp {v} into {reg}")
+        #print(self.input)
         if reg == 'w':
             self.w = v
         elif reg == 'x':
@@ -133,7 +139,95 @@ class ALU:
 
 input = open('data', 'r').read()
 alu = ALU(input)
-print(alu.prog)
+print(len(alu.prog))
 
-valid = alu.run(13579246899999)
-print(valid)
+import random
+
+def randomModelNum():
+    x = [str(random.randint(1,9)) for i in range(14)]
+    #print(x)
+    return "".join(x)
+
+def test1():
+    n = 0
+    minz = 9999999999
+    while True:
+        n += 1
+        num = randomModelNum()
+        print(n, num, minz)
+        if alu.run(num):
+            break
+        minz = min(minz, alu.z)
+
+def pickRandom(pool):
+    x = random.random()
+    sum = 0
+    for num, fit in pool:
+        sum += fit
+        if sum > x:
+            return num
+    return num
+
+def mutate(a):
+    l = len(a)
+    x = random.randint(0, l-1)
+    if x > 0:
+        c = a[:x-1] + str(random.randint(1,9)) + a[x:]
+    else:
+        c = str(random.randint(1,9)) + a[1:]
+    #print(f"mutated {a} at {x} to {c} {len(c)}")
+    return c
+
+def crossover(a, b):
+    if a == b:
+        return mutate(a)
+
+    l = len(a)
+    x = random.randint(0, l-1)
+    c = a[:x] + b[x:]
+    #print(f"crossover {a} x {b} at {x} = {c} {len(c)}")
+    return c
+
+def genetic(alu, pop):
+    z = {}
+    for i in pop:
+        alu.run(i)
+        z[i] = alu.z
+    #print(z)
+    minz = min(z.values())
+    if minz == 0:
+        for k in z:
+            if z[k] == 0:
+                print(f"valid! {k}")
+    print(f"min z = {minz}")
+    # fit = {}
+    # for k in z:
+        # if z[k] == 0:
+        #     fit[k] = int(k)/1e14
+        # else:
+        #     fit[k] = 1/(1+z[k])
+        #fit[k] = 1/(1+z[k])
+    fit = {i[0]:1/(1+i[1]) for i in z.items()}
+    total = sum(fit.values())
+    #print(fit, total)
+    fit = {i[0]:i[1]/total for i in fit.items()}
+    print(fit)
+    pool = sorted(fit.items(), key=lambda item: item[1])
+    # for i in pool:
+    #     print(i)
+    sz = len(pop)
+    next = []
+    for i in range(sz):
+        a = pickRandom(pool)
+        b = pickRandom(pool)
+        c = crossover(a, b)
+        next.append(c)
+        #print(a, b, c)
+    return next
+
+pop = {randomModelNum() for i in range(10)}
+print(pop)
+
+for i in range(1000):
+    pop = genetic(alu, pop)
+    #print(pop)
