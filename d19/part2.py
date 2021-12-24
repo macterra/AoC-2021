@@ -158,6 +158,9 @@ input = """--- scanner 0 ---
 30,-46,-14"""
 
 class Scanner:
+    def __init__(self):
+        self.offset = np.array([0,0,0])
+
     def read(self, input):
         lines = input.split('\n')
         m = re.match("--- scanner (\d+) ---", lines[0])
@@ -201,8 +204,7 @@ class Scanner:
         beacons = self.variants[:,var,:]
         for i in range(len(beacons)):
             offset = beacons[i] - sync
-            beacons -= offset
-            mine = { tuple(row) for row in beacons.astype(int) }
+            mine = { tuple(row) for row in (beacons-offset).astype(int) }
             common = cloud.intersection(mine)
             if len(common) >= 12:
                 print(f"bingo {var} {offset} {len(common)}")
@@ -220,7 +222,7 @@ class Scanner:
         scanner.generateVariants()
         return scanner
  
-#input = open('data', 'r').read()
+input = open('data', 'r').read()
 
 blocks = input.split('\n\n')
 #print(blocks)
@@ -230,14 +232,15 @@ for block in blocks:
     scanner.read(block)
     scanners.append(scanner)
 print(scanners)
+backup = scanners.copy()
 
 def search(scanners):
     count = len(scanners)
     for i in range(count):
         for j in range(i+1, count):
             print(i,j)
-            s1 = scanners[i]
-            s2 = scanners[j]
+            s1 = scanners[j]
+            s2 = scanners[i]
             match = s1.bestMatch(s2.cloud(0))
             if match:
                 s3 = s2.merge(match)
@@ -249,5 +252,33 @@ def search(scanners):
 while len(scanners) > 1:
     scanners = search(scanners)
 
-beacons = scanners[0].beacons
-print(len(beacons))
+s0 = scanners[0]
+print(len(s0.beacons), s0.beacons)
+cloud = s0.cloud(0)
+
+scanners = backup
+
+for scanner in scanners:
+    match = scanner.bestMatch(cloud)
+    print(f"bajingo {scanner} {len(match)} {scanner.offset}")
+
+offsets = [s.offset for s in scanners]
+
+print(offsets)
+count = len(offsets)
+
+def manhattan(p1, p2):
+    dist = 0
+    dist += abs(p1[0] - p2[0])
+    dist += abs(p1[1] - p2[1])
+    dist += abs(p1[2] - p2[2])
+    return dist 
+
+maxd = 0
+for i in range(count):
+    for j in range(i+1, count):
+        dist = manhattan(offsets[i], offsets[j])
+        maxd = max(maxd, dist)
+        print(i, j, dist, maxd)
+
+print(maxd)
